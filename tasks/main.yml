@@ -1,0 +1,72 @@
+- name: clone DataHub repo
+  git:
+    repo: https://github.com/datahub-project/datahub.git
+    dest: "{{ datahub_data_volume }}"
+    clone: yes
+    force: yes
+
+- name: install pip
+  apt: 
+    name: python3-pip 
+    state: present
+
+- name: upgrade pip
+  pip:
+    name: pip
+    executable: pip3
+    state: latest
+
+- name: install datahub cli
+  pip:
+    name: 
+      - wheel
+      - setuptools
+      - acryl-datahub
+
+- name: Create a directory
+  ansible.builtin.file:
+    path: "{{ datahub_plugins }}/notification"
+    state: directory
+    mode: '0755'
+
+- name: copy config notification
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ datahub_plugins }}/notification/{{ item | basename }}"
+  with_fileglob:
+    - ../templates/notification/*
+
+- name: install module notification
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/pip3 install -e ."
+    chdir: "{{ datahub_plugins }}/notification/"
+
+- name: copy config docker compose
+  ansible.builtin.template:
+    src: docker-compose.quickstart.yml
+    dest: "{{ datahub_docker_compose_volume }}"
+
+- name: create directory conf
+  ansible.builtin.file:
+    path: "{{ datahub_conf }}"
+    state: directory
+    mode: '0755'
+
+- name: create directory jaas conf
+  ansible.builtin.file:
+    path: "{{ jaas_conf }}"
+    state: directory
+    mode: '0755'
+
+- name: copy config jaas
+  ansible.builtin.template:
+    src: jaas.conf
+    dest: "{{ jaas_conf }}"
+
+- name: deploy docker compose
+  shell:  "DATAHUB_VERSION={{ datahub_version }} {{ datahub_cli }} docker quickstart --quickstart-compose-file {{ datahub_docker_compose_volume }}/docker-compose.quickstart.yml"
+
+- name: activate notification
+  ansible.builtin.command:
+    cmd: "screen -dm datahub actions -c custom_action.yaml"
+    chdir: "{{ datahub_plugins }}/notification/"

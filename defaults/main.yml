@@ -1,0 +1,19 @@
+---
+
+datahub_data_volume: "/home/urguev/datahub"
+
+datahub_docker_compose_volume: "/home/urguev/datahub/docker/quickstart"
+
+datahub_cli: "/home/urguev/.local/bin/datahub"
+
+jaas_conf: "/home/urguev/datahub-conf/jaas.conf"
+
+elastic_host: "78.108.90.107"
+
+datahub_version: "v0.9.1"
+
+datahub_plugins: "/home/urguev/.datahub/plugins"
+
+notification_mail: "t.urguev@astera.in"
+
+datahub_conf: "/home/turguev/datahub-conf"

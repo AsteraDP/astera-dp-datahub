@@ -1,0 +1,20 @@
+# custom_action.yaml
+name: "custom_action_test"
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: ${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}
+      schema_registry_url: ${SCHEMA_REGISTRY_URL:-http://localhost:8081}
+
+filter:
+  event_type: "EntityChangeEvent_v1"
+  event:
+    operation: ["ADD", "REMOVE"]
+
+
+action:
+  type: "custom_action:CustomAction"
+  config:
+    # Some sample configuration which should be printed on create.
+    config1: value1
